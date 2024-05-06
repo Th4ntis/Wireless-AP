@@ -1,5 +1,5 @@
 # Wireless-AP
-This is a simple/crude bash script to setup a wireless access point on Debian based linux using hostapd and dnsmasq. This will create an open AP or a WPA Protected AP with the given SSID/Password.
+This is a simple/crude bash script to setup a wireless access point on Debian based linux using hostapd and dnsmasq. This will create an open AP or a WPA Protected AP with the given SSID/Password. This will also ask if you want to capture packets using tcpdump, and what you want the file saved as if so. This will install hostapd dnsmasq and tcpdump if they are not already installed.
 
 # Using
 Make the script executable
