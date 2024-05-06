@@ -29,6 +29,7 @@ install_package() {
 # Check and install necessary packages
 install_package hostapd
 install_package dnsmasq
+install_package tcpdump
 
 # Trap CTRL+C and call cleanup function
 trap 'cleanup; exit 1' SIGINT
@@ -36,24 +37,31 @@ trap 'cleanup; exit 1' SIGINT
 cleanup() {
     echo -e "\n$green SIGINT Received. Stopping services and resetting interface..."
     systemctl stop hostapd dnsmasq
+    pkill tcpdump
     ip addr flush dev $interface
     ip link set $interface down && ip link set $interface up
 }
 
 # Main functionality
 read -p "Do you want a password on the AP? (y/n): " with_pw
+read -p "Do you want to capture packets for analysis? (y/n): " capture_packet
 
 read -p "Enter the SSID (AP Name): " ssid
 read -p "Enter the Wireless Interface (e.g., wlan0): " interface
 read -p "What is the interface your internet is on? (e.g, eth0): " internet
 
 if [[ "$with_pw" =~ [Yy] ]]; then
-    read -s -p "Enter the Password (at least 6 characters): " password
+    read -s -p "Enter the AP Password (at least 6 characters): " password
     echo
     if [[ ${#password} -lt 6 ]]; then
         echo -e "$red Password must be at least 6 characters."
         exit 1
     fi
+fi
+
+if [[ "$capture_packet" =~ [Yy] ]]; then
+    read -p "What do you want to save the packet capture as? (e.g, Capture.pcap): " out_file
+    echo
 fi
 
 # Configure hostapd
@@ -97,5 +105,11 @@ iptables -A FORWARD -i $interface -o $internet -j ACCEPT
 echo -e "$green Restarting network services..."
 systemctl restart hostapd dnsmasq
 
-echo -e "$green Wireless access point is now running with SSID: $ssid. Press Ctrl+C to stop."
+# Start Packet Capture in a new terminal window
+if [[ "$capture_packet" =~ [Yy] ]]; then
+    xterm -e "/bin/bash -c 'tcpdump -i $interface -w $out_file; exec bash'" &
+fi
+
+echo -e "$green Wireless access point is now running with SSID: $ssid, and packets being saved to: $out_file. Press Ctrl+C to stop."
+
 while true; do sleep 10; done  # Maintain the script running
