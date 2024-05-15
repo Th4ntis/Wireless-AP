@@ -47,6 +47,7 @@ read -p "Do you want a password on the AP? (y/n): " with_pw
 read -p "Do you want to capture packets for analysis? (y/n): " capture_packet
 
 read -p "Enter the SSID (AP Name): " ssid
+ip link | grep -E 'wl' | awk '{print $2}' | sed 's/://g'
 read -p "Enter the Wireless Interface (e.g., wlan0): " interface
 read -p "What is the interface your internet is on? (e.g, eth0): " internet
 
