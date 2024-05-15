@@ -111,6 +111,14 @@ if [[ "$capture_packet" =~ [Yy] ]]; then
     xterm -e "/bin/bash -c 'tcpdump -i $interface -w $out_file; exec bash'" &
 fi
 
-echo -e "$green Wireless access point is now running with SSID: $ssid, and packets being saved to: $out_file. Press Ctrl+C to stop."
+if [[ "$capture_packet" =~ [Yy] ]]; then
+    echo -e "$green Wireless access point is now running with SSID: $ssid, and packets being saved to: $out_file. Press Ctrl+C to stop."
+    echo
+fi
+
+if [[ "$capture_packet" =~ [Nn] ]]; then
+    echo -e "$green Wireless access point is now running with SSID: $ssid. Press Ctrl+C to stop."
+    echo
+fi
 
 while true; do sleep 10; done  # Maintain the script running
